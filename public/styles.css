@@ -36,11 +36,13 @@ body {
 header {
   text-align: center;
   margin-bottom: 30px;
+  padding: 15px 0;
 }
 
 header h1 {
-  font-size: 2rem;
+  font-size: 1.8rem;
   margin-bottom: 20px;
+  line-height: 1.2;
 }
 
 .progress-container {
@@ -50,7 +52,33 @@ header h1 {
 .progress-info {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.progress-stat {
+  flex: 1;
+  min-width: 80px;
+  background-color: white;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.stat-label {
+  color: var(--gray-color);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--dark-color);
 }
 
 /* Slider container */
@@ -383,8 +411,44 @@ footer {
 
 /* Media queries */
 @media (max-width: 600px) {
+  body {
+    font-size: 16px;
+    padding-bottom: 30px;
+  }
+  
+  .container {
+    padding: 15px;
+  }
+  
+  header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+  
+  .progress-info {
+    gap: 10px;
+  }
+  
+  .progress-stat {
+    min-width: 70px;
+    padding: 8px;
+  }
+  
+  .stat-label {
+    font-size: 0.7rem;
+  }
+  
+  .stat-value {
+    font-size: 1.1rem;
+  }
+  
+  .workout-card {
+    padding: 15px;
+  }
+  
   .exercise-container {
     grid-template-columns: 1fr;
+    gap: 15px;
   }
   
   .navigation-buttons, .set-day-control {
@@ -394,5 +458,9 @@ footer {
   
   .btn {
     width: 100%;
+  }
+  
+  .admin-controls {
+    padding: 15px;
   }
 }

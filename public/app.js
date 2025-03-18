@@ -12,6 +12,7 @@ function initDOMElements() {
     pushExercise: document.getElementById('pushExercise'),
     squatsExercise: document.getElementById('squatsExercise'),
     daySlider: document.getElementById('daySlider'),
+    progressPercent: document.getElementById('progressPercent'),
     markComplete: document.getElementById('markComplete'),
     prevDay: document.getElementById('prevDay'),
     nextDay: document.getElementById('nextDay'),
@@ -34,7 +35,7 @@ function initDOMElements() {
 // We'll assign these later when DOM is fully loaded
 let currentDayElement, currentWeekElement, dayNumberElement, intensityBadgeElement;
 let pullExerciseElement, pushExerciseElement, squatsExerciseElement, daySliderElement;
-let markCompleteButton, prevDayButton, nextDayButton;
+let progressPercentElement, markCompleteButton, prevDayButton, nextDayButton;
 // Admin control elements
 let dayToSetInput, setDayButton, resetProgressButton;
 
@@ -89,6 +90,12 @@ function updateUI() {
   // Find the highest completed day
   const highestCompletedDay = completedDays.length ? Math.max(...completedDays) : 0;
   const completedPercentage = (highestCompletedDay / 168) * 100;
+  const roundedPercentage = Math.round(completedPercentage);
+  
+  // Update progress percentage display
+  if (progressPercentElement) {
+    progressPercentElement.textContent = `${roundedPercentage}%`;
+  }
   
   // Set the progress bar to show completed days
   daySliderElement.style.setProperty('--progress-percentage', `${completedPercentage}%`);
@@ -245,6 +252,7 @@ function init() {
   pushExerciseElement = elements.pushExercise;
   squatsExerciseElement = elements.squatsExercise;
   daySliderElement = elements.daySlider;
+  progressPercentElement = elements.progressPercent;
   markCompleteButton = elements.markComplete;
   prevDayButton = elements.prevDay;
   nextDayButton = elements.nextDay;

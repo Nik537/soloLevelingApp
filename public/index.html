@@ -12,8 +12,18 @@
       <h1>6 Month Solo Leveling Daily Challenge</h1>
       <div class="progress-container">
         <div class="progress-info">
-          <p>Current Progress: Day <span id="currentDay">1</span> of 168</p>
-          <p>Week: <span id="currentWeek">1</span> of 24</p>
+          <div class="progress-stat">
+            <div class="stat-label">Day</div>
+            <div class="stat-value"><span id="currentDay">1</span>/168</div>
+          </div>
+          <div class="progress-stat">
+            <div class="stat-label">Week</div>
+            <div class="stat-value"><span id="currentWeek">1</span>/24</div>
+          </div>
+          <div class="progress-stat">
+            <div class="stat-label">Progress</div>
+            <div class="stat-value" id="progressPercent">0%</div>
+          </div>
         </div>
         <div class="slider-container">
           <input type="range" min="1" max="168" value="1" class="day-slider" id="daySlider">
