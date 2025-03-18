@@ -220,6 +220,16 @@ header h1 {
   text-decoration: underline;
 }
 
+/* Non-clickable text in warmup/cooldown */
+.warmup-details li, .cooldown-details li {
+  color: var(--dark-color);
+}
+
+.exercise-detail {
+  color: var(--dark-color);
+  font-weight: normal;
+}
+
 /* Exercise Container */
 .exercise-container {
   display: grid;
@@ -268,9 +278,14 @@ header h1 {
 }
 
 .exercise-count {
-  color: var(--primary-color);
+  color: var(--dark-color);
   font-size: 1.3rem;
   font-weight: bold;
+}
+
+.reps-text {
+  font-weight: normal;
+  font-size: 0.9rem;
 }
 
 /* Pull exercise specific */

@@ -151,7 +151,7 @@ function formatExercise(exercise) {
     exercise.forEach(ex => {
       const exerciseType = ex.type.toLowerCase().replace(/\s+/g, '-');
       html += `<p class="exercise-name"><a href="javascript:void(0)" onclick="openExerciseGuide('${exerciseType}')">${ex.type}</a></p>`;
-      html += `<p class="exercise-count">${ex.count} reps</p>`;
+      html += `<p class="exercise-count">${ex.count} <span class="reps-text">reps</span></p>`;
     });
     return html;
   } else {
@@ -159,7 +159,7 @@ function formatExercise(exercise) {
     const exerciseType = exercise.type.toLowerCase().replace(/\s+/g, '-');
     return `
       <p class="exercise-name"><a href="javascript:void(0)" onclick="openExerciseGuide('${exerciseType}')">${exercise.type}</a></p>
-      <p class="exercise-count">${exercise.count} reps</p>
+      <p class="exercise-count">${exercise.count} <span class="reps-text">reps</span></p>
     `;
   }
 }
@@ -175,7 +175,7 @@ function updateExerciseUI(currentDay) {
   // Leg exercise (squats)
   squatsExerciseElement.innerHTML = `
     <p class="exercise-name"><a href="javascript:void(0)" onclick="openExerciseGuide('squats')">Squats</a></p>
-    <p class="exercise-count">${currentDay.squats} reps</p>
+    <p class="exercise-count">${currentDay.squats} <span class="reps-text">reps</span></p>
   `;
 }
 
