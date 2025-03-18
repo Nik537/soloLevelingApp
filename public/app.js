@@ -11,7 +11,7 @@ function initDOMElements() {
     pullExercise: document.getElementById('pullExercise'),
     pushExercise: document.getElementById('pushExercise'),
     squatsExercise: document.getElementById('squatsExercise'),
-    progressFill: document.getElementById('progressFill'),
+    daySlider: document.getElementById('daySlider'),
     markComplete: document.getElementById('markComplete'),
     prevDay: document.getElementById('prevDay'),
     nextDay: document.getElementById('nextDay')
@@ -29,7 +29,7 @@ function initDOMElements() {
 
 // We'll assign these later when DOM is fully loaded
 let currentDayElement, currentWeekElement, dayNumberElement, intensityBadgeElement;
-let pullExerciseElement, pushExerciseElement, squatsExerciseElement, progressFillElement;
+let pullExerciseElement, pushExerciseElement, squatsExerciseElement, daySliderElement;
 let markCompleteButton, prevDayButton, nextDayButton;
 
 // App state
@@ -76,9 +76,16 @@ function updateUI() {
   currentDayElement.textContent = dayNumber;
   currentWeekElement.textContent = weekNumber;
   
-  // Update progress bar
-  const progressPercentage = (dayNumber / 168) * 100;
-  progressFillElement.style.width = `${progressPercentage}%`;
+  // Update day slider position and progress bar
+  daySliderElement.value = dayNumber;
+  
+  // Calculate completed progress
+  // Find the highest completed day
+  const highestCompletedDay = completedDays.length ? Math.max(...completedDays) : 0;
+  const completedPercentage = (highestCompletedDay / 168) * 100;
+  
+  // Set the progress bar to show completed days
+  daySliderElement.style.setProperty('--progress-percentage', `${completedPercentage}%`);
   
   // Update workout card
   dayNumberElement.textContent = dayNumber;
@@ -94,13 +101,25 @@ function updateUI() {
   
   // Update Mark Complete button state
   if (completedDays.includes(dayNumber)) {
+    // Day is already completed
     markCompleteButton.textContent = 'COMPLETED ✓';
     markCompleteButton.className = 'btn btn-completed';
-    markCompleteButton.disabled = true; // Disable button for completed days
+    markCompleteButton.disabled = true;
   } else {
-    markCompleteButton.textContent = 'MARK COMPLETE';
-    markCompleteButton.className = 'btn btn-primary';
-    markCompleteButton.disabled = false;
+    // Check if previous day is completed
+    const previousDayCompleted = dayNumber === 1 || completedDays.includes(dayNumber - 1);
+    
+    if (previousDayCompleted) {
+      // Previous day is completed, allow marking this day as complete
+      markCompleteButton.textContent = 'MARK COMPLETE';
+      markCompleteButton.className = 'btn btn-primary';
+      markCompleteButton.disabled = false;
+    } else {
+      // Previous day not completed, show message and disable button
+      markCompleteButton.textContent = 'COMPLETE PREVIOUS DAY FIRST';
+      markCompleteButton.className = 'btn btn-secondary';
+      markCompleteButton.disabled = true;
+    }
   }
   
   // Update navigation buttons
@@ -168,24 +187,37 @@ function goToNextDay() {
 function markComplete() {
   const currentDay = workoutData[currentDayIndex].day;
   
-  // Only proceed if the day is not already completed
-  if (!completedDays.includes(currentDay)) {
-    console.log('Marking day', currentDay, 'as complete');
-    completedDays.push(currentDay);
-    saveState();
-    
-    // Update UI immediately
-    updateUI();
-    
-    // Automatically go to next day if not on the last day
-    if (currentDayIndex < workoutData.length - 1) {
-      setTimeout(() => {
-        goToNextDay();
-      }, 1000);
-    } else {
-      // Show congratulations for completing the program
-      alert('Congratulations! You have completed the entire 24-week program! 🎉');
-    }
+  // Check if the day is not already completed
+  if (completedDays.includes(currentDay)) {
+    console.log('Day', currentDay, 'is already completed');
+    return;
+  }
+  
+  // Check if previous day is completed (except for day 1)
+  const previousDayCompleted = currentDay === 1 || completedDays.includes(currentDay - 1);
+  
+  if (!previousDayCompleted) {
+    console.log('Cannot complete day', currentDay, '- previous day not completed');
+    alert('Please complete the previous day first.');
+    return;
+  }
+  
+  // All checks passed, mark the day as complete
+  console.log('Marking day', currentDay, 'as complete');
+  completedDays.push(currentDay);
+  saveState();
+  
+  // Update UI immediately
+  updateUI();
+  
+  // Automatically go to next day if not on the last day
+  if (currentDayIndex < workoutData.length - 1) {
+    setTimeout(() => {
+      goToNextDay();
+    }, 1000);
+  } else {
+    // Show congratulations for completing the program
+    alert('Congratulations! You have completed the entire 24-week program! 🎉');
   }
 }
 
@@ -206,7 +238,7 @@ function init() {
   pullExerciseElement = elements.pullExercise;
   pushExerciseElement = elements.pushExercise;
   squatsExerciseElement = elements.squatsExercise;
-  progressFillElement = elements.progressFill;
+  daySliderElement = elements.daySlider;
   markCompleteButton = elements.markComplete;
   prevDayButton = elements.prevDay;
   nextDayButton = elements.nextDay;
@@ -225,6 +257,21 @@ function init() {
   nextDayButton.addEventListener('click', function() {
     console.log('Next day clicked');
     goToNextDay();
+  });
+  
+  // Add day slider event listener
+  daySliderElement.addEventListener('input', function() {
+    const day = parseInt(this.value, 10);
+    console.log('Slider moved to day:', day);
+    
+    // Convert from 1-based day number to 0-based index
+    const dayIndex = workoutData.findIndex(workout => workout.day === day);
+    
+    if (dayIndex !== -1) {
+      currentDayIndex = dayIndex;
+      saveState();
+      updateUI();
+    }
   });
   
   // Load state and update UI
