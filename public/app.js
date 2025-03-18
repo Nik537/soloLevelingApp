@@ -14,7 +14,11 @@ function initDOMElements() {
     daySlider: document.getElementById('daySlider'),
     markComplete: document.getElementById('markComplete'),
     prevDay: document.getElementById('prevDay'),
-    nextDay: document.getElementById('nextDay')
+    nextDay: document.getElementById('nextDay'),
+    // Admin controls
+    dayToSet: document.getElementById('dayToSet'),
+    setDayBtn: document.getElementById('setDayBtn'),
+    resetProgressBtn: document.getElementById('resetProgressBtn')
   };
   
   // Check if all elements are found
@@ -31,6 +35,8 @@ function initDOMElements() {
 let currentDayElement, currentWeekElement, dayNumberElement, intensityBadgeElement;
 let pullExerciseElement, pushExerciseElement, squatsExerciseElement, daySliderElement;
 let markCompleteButton, prevDayButton, nextDayButton;
+// Admin control elements
+let dayToSetInput, setDayButton, resetProgressButton;
 
 // App state
 let currentDayIndex = 0;
@@ -242,6 +248,10 @@ function init() {
   markCompleteButton = elements.markComplete;
   prevDayButton = elements.prevDay;
   nextDayButton = elements.nextDay;
+  // Admin controls
+  dayToSetInput = elements.dayToSet;
+  setDayButton = elements.setDayBtn;
+  resetProgressButton = elements.resetProgressBtn;
   
   // Add event listeners
   markCompleteButton.addEventListener('click', function() {
@@ -274,6 +284,15 @@ function init() {
     }
   });
   
+  // Add admin control event listeners
+  setDayButton.addEventListener('click', function() {
+    setSpecificDay();
+  });
+  
+  resetProgressButton.addEventListener('click', function() {
+    resetAllProgress();
+  });
+  
   // Load state and update UI
   loadState();
   updateUI();
@@ -283,6 +302,99 @@ function init() {
 
 // Start the app
 window.addEventListener('DOMContentLoaded', init);
+
+// Set a specific day function with completion of previous days
+function setSpecificDay() {
+  const dayValue = dayToSetInput.value.trim();
+  
+  // Validate input
+  if (!dayValue) {
+    alert('Please enter a day number.');
+    return;
+  }
+  
+  const day = parseInt(dayValue, 10);
+  
+  if (isNaN(day) || day < 1 || day > 168) {
+    alert('Please enter a valid day number between 1 and 168.');
+    return;
+  }
+  
+  // Find the index for the day
+  const dayIndex = workoutData.findIndex(workout => workout.day === day);
+  
+  if (dayIndex === -1) {
+    alert('Day not found in workout data.');
+    return;
+  }
+  
+  // Show confirmation dialog with details
+  const targetDay = workoutData[dayIndex];
+  let confirmMessage = `Are you sure you want to set your current day to Day ${day}?\n\n`;
+  
+  if (day > 1) {
+    confirmMessage += `• Days 1 to ${day - 1} will be marked as completed\n`;
+  }
+  
+  confirmMessage += `• Day ${day} will be set as the current day\n`;
+  
+  // Check if there are completed days ahead that would be unmarked
+  const hasCompletedDaysAhead = completedDays.some(completedDay => completedDay >= day);
+  if (hasCompletedDaysAhead) {
+    confirmMessage += `• Any completed days after Day ${day - 1} will be marked as uncompleted\n`;
+  }
+  
+  // Ask for confirmation
+  const confirmed = confirm(confirmMessage);
+  
+  if (!confirmed) {
+    return;
+  }
+  
+  // Create a new array with days 1 to (selected day - 1) as completed
+  const newCompletedDays = [];
+  
+  // Add all days from 1 to (day-1) as completed
+  for (let i = 1; i < day; i++) {
+    newCompletedDays.push(i);
+  }
+  
+  // Set the completed days array
+  completedDays = newCompletedDays;
+  
+  // Set current day index
+  currentDayIndex = dayIndex;
+  
+  // Save state and update UI
+  saveState();
+  updateUI();
+  
+  // Clear the input
+  dayToSetInput.value = '';
+  
+  // Confirmation message
+  alert(`Your current day has been set to Day ${day}. All previous days have been marked as completed.`);
+}
+
+// Reset all progress function
+function resetAllProgress() {
+  // Ask for confirmation
+  const confirmed = confirm('Are you sure you want to reset all progress? This will delete all completed days and cannot be undone.');
+  
+  if (confirmed) {
+    console.log('Resetting all progress');
+    // Reset completed days array
+    completedDays = [];
+    // Reset to day 1
+    currentDayIndex = 0;
+    // Save state
+    saveState();
+    // Update UI
+    updateUI();
+    // Show confirmation
+    alert('All progress has been reset. Starting from Day 1.');
+  }
+}
 
 // Exercise guide opener function
 window.openExerciseGuide = function(exerciseType) {
