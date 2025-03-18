@@ -1,0 +1,242 @@
+// Add console logging to debug
+console.log('App script loaded');
+
+// DOM Elements - wrapped in a function to ensure they're gathered after DOM is loaded
+function initDOMElements() {
+  const elements = {
+    currentDay: document.getElementById('currentDay'),
+    currentWeek: document.getElementById('currentWeek'),
+    dayNumber: document.getElementById('dayNumber'),
+    intensityBadge: document.getElementById('intensityBadge'),
+    pullExercise: document.getElementById('pullExercise'),
+    pushExercise: document.getElementById('pushExercise'),
+    squatsExercise: document.getElementById('squatsExercise'),
+    progressFill: document.getElementById('progressFill'),
+    markComplete: document.getElementById('markComplete'),
+    prevDay: document.getElementById('prevDay'),
+    nextDay: document.getElementById('nextDay')
+  };
+  
+  // Check if all elements are found
+  Object.entries(elements).forEach(([name, element]) => {
+    if (!element) {
+      console.error(`Element ${name} not found!`);
+    }
+  });
+  
+  return elements;
+}
+
+// We'll assign these later when DOM is fully loaded
+let currentDayElement, currentWeekElement, dayNumberElement, intensityBadgeElement;
+let pullExerciseElement, pushExerciseElement, squatsExerciseElement, progressFillElement;
+let markCompleteButton, prevDayButton, nextDayButton;
+
+// App state
+let currentDayIndex = 0;
+let completedDays = [];
+
+// Load saved state from localStorage
+function loadState() {
+  const savedCurrentDay = localStorage.getItem('currentDayIndex');
+  const savedCompletedDays = localStorage.getItem('completedDays');
+  
+  if (savedCurrentDay !== null) {
+    currentDayIndex = parseInt(savedCurrentDay, 10);
+  }
+  
+  if (savedCompletedDays !== null) {
+    completedDays = JSON.parse(savedCompletedDays);
+  }
+}
+
+// Save state to localStorage
+function saveState() {
+  localStorage.setItem('currentDayIndex', currentDayIndex);
+  localStorage.setItem('completedDays', JSON.stringify(completedDays));
+}
+
+// Update UI based on current day
+function updateUI() {
+  const currentDay = workoutData[currentDayIndex];
+  const dayNumber = currentDay.day;
+  const weekNumber = Math.ceil(dayNumber / 7);
+  
+  // Update header progress
+  currentDayElement.textContent = dayNumber;
+  currentWeekElement.textContent = weekNumber;
+  
+  // Update progress bar
+  const progressPercentage = (dayNumber / 168) * 100;
+  progressFillElement.style.width = `${progressPercentage}%`;
+  
+  // Update workout card
+  dayNumberElement.textContent = dayNumber;
+  
+  // Set intensity badge
+  if (currentDay.isLighter) {
+    intensityBadgeElement.textContent = 'Lighter Day';
+    intensityBadgeElement.className = 'badge lighter';
+  } else {
+    intensityBadgeElement.textContent = 'Regular Day';
+    intensityBadgeElement.className = 'badge regular';
+  }
+  
+  // Update Mark Complete button state
+  if (completedDays.includes(dayNumber)) {
+    markCompleteButton.textContent = 'COMPLETED ✓ (CLICK TO UNDO)';
+    markCompleteButton.className = 'btn btn-completed';
+    markCompleteButton.disabled = false; // Enable button to allow toggling
+  } else {
+    markCompleteButton.textContent = 'MARK COMPLETE';
+    markCompleteButton.className = 'btn btn-primary';
+    markCompleteButton.disabled = false;
+  }
+  
+  // Update navigation buttons
+  prevDayButton.disabled = currentDayIndex === 0;
+  nextDayButton.disabled = currentDayIndex === workoutData.length - 1;
+  
+  // Update exercises
+  updateExerciseUI(currentDay);
+}
+
+// Helper function to format exercise display
+function formatExercise(exercise) {
+  if (Array.isArray(exercise)) {
+    // For combined exercises like weeks 7-10 with multiple pull/push exercises
+    let html = '';
+    exercise.forEach(ex => {
+      html += `<p class="exercise-name">${ex.type}</p>`;
+      html += `<p class="exercise-count">${ex.count} reps</p>`;
+    });
+    return html;
+  } else {
+    // For simple exercises
+    return `
+      <p class="exercise-name">${exercise.type}</p>
+      <p class="exercise-count">${exercise.count} reps</p>
+    `;
+  }
+}
+
+// Update exercise display
+function updateExerciseUI(currentDay) {
+  // Pull exercise
+  pullExerciseElement.innerHTML = formatExercise(currentDay.pull);
+  
+  // Push exercise
+  pushExerciseElement.innerHTML = formatExercise(currentDay.push);
+  
+  // Squats
+  squatsExerciseElement.innerHTML = `<p class="exercise-count">${currentDay.squats} reps</p>`;
+}
+
+// Navigation functions
+function goToPrevDay() {
+  if (currentDayIndex > 0) {
+    currentDayIndex--;
+    saveState();
+    updateUI();
+  }
+}
+
+function goToNextDay() {
+  if (currentDayIndex < workoutData.length - 1) {
+    currentDayIndex++;
+    saveState();
+    updateUI();
+  }
+}
+
+// Toggle current day as complete/incomplete
+function markComplete() {
+  const currentDay = workoutData[currentDayIndex].day;
+  
+  if (completedDays.includes(currentDay)) {
+    // If already completed, mark as incomplete
+    console.log('Unmarking day', currentDay);
+    completedDays = completedDays.filter(day => day !== currentDay);
+    saveState();
+    updateUI();
+  } else {
+    // Mark as complete
+    console.log('Marking day', currentDay, 'as complete');
+    completedDays.push(currentDay);
+    saveState();
+    
+    // Update UI
+    markCompleteButton.textContent = 'COMPLETED ✓ (CLICK TO UNDO)';
+    markCompleteButton.className = 'btn btn-completed';
+    
+    // Automatically go to next day if not on the last day
+    if (currentDayIndex < workoutData.length - 1) {
+      setTimeout(() => {
+        goToNextDay();
+      }, 1000);
+    } else {
+      // Show congratulations for completing the program
+      alert('Congratulations! You have completed the entire 24-week program! 🎉');
+    }
+  }
+}
+
+// Event listeners are set up in init()
+
+// Initialize the app
+function init() {
+  try {
+    console.log('Initializing app...');
+    
+    // Get DOM elements 
+    const elements = initDOMElements();
+    
+    // Assign elements to global variables
+    currentDayElement = elements.currentDay;
+    currentWeekElement = elements.currentWeek;
+    dayNumberElement = elements.dayNumber;
+    intensityBadgeElement = elements.intensityBadge;
+    pullExerciseElement = elements.pullExercise;
+    pushExerciseElement = elements.pushExercise;
+    squatsExerciseElement = elements.squatsExercise;
+    progressFillElement = elements.progressFill;
+    markCompleteButton = elements.markComplete;
+    prevDayButton = elements.prevDay;
+    nextDayButton = elements.nextDay;
+    
+    // Check if workoutData is available
+    if (typeof workoutData === 'undefined') {
+      throw new Error('workoutData is not defined');
+    }
+    
+    console.log('Workout data loaded:', workoutData.length, 'days');
+    
+    // Add event listeners
+    markCompleteButton.addEventListener('click', function(e) {
+      console.log('Mark complete clicked');
+      markComplete();
+    });
+    
+    prevDayButton.addEventListener('click', function(e) {
+      console.log('Prev day clicked');
+      goToPrevDay();
+    });
+    
+    nextDayButton.addEventListener('click', function(e) {
+      console.log('Next day clicked');
+      goToNextDay();
+    });
+    
+    // Load state and update UI
+    loadState();
+    updateUI();
+    
+    console.log('App initialized successfully');
+  } catch (error) {
+    console.error('Error initializing app:', error);
+    alert('Error initializing app: ' + error.message);
+  }
+}
+
+// Start the app when DOM is loaded
+window.addEventListener('DOMContentLoaded', init);
