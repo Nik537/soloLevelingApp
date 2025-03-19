@@ -377,6 +377,31 @@ footer {
   font-size: 0.9rem;
 }
 
+.account-section {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--light-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+#userEmailDisplay {
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+#logoutButton {
+  font-size: 0.8rem;
+  padding: 5px 10px;
+  opacity: 0.8;
+}
+
+#logoutButton:hover {
+  opacity: 1;
+}
+
 /* Admin Controls */
 .admin-controls {
   margin-top: 30px;
@@ -477,5 +502,128 @@ footer {
   
   .admin-controls {
     padding: 15px;
+  }
+}
+
+/* Paywall Styles */
+.paywall-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.paywall-content {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.paywall-content h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.price {
+  font-size: 1.2rem;
+  margin: 20px 0;
+}
+
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.payment-button {
+  padding: 12px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.stripe {
+  background-color: #6772e5;
+  color: white;
+}
+
+.stripe:hover {
+  background-color: #5469d4;
+}
+
+.paypal {
+  background-color: #0070ba;
+  color: white;
+}
+
+.paypal:hover {
+  background-color: #005ea6;
+}
+
+.demo-controls {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.demo-button {
+  background-color: #28a745;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.demo-button:hover {
+  background-color: #218838;
+}
+
+#loginForm {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.email-input {
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.login-button {
+  background-color: #17a2b8;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #138496;
+}
+
+@media (max-width: 768px) {
+  .paywall-content {
+    width: 95%;
+    padding: 20px;
   }
 }
