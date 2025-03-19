@@ -425,7 +425,9 @@ window.openExerciseGuide = function(exerciseType) {
     
     // Cooldown exercises
     'forward-fold': 'https://www.youtube.com/watch?v=g7Uhp5tphAs',
+    'quad-stretch': 'https://www.youtube.com/watch?v=2hKbghN2fUE',
     'low-lunge': 'https://www.youtube.com/watch?v=yfPE0-iMbdg',
+    'pigeon-pose': 'https://www.youtube.com/watch?v=FVXPPICQfhU',
     'pec-stretch': 'https://www.youtube.com/watch?v=SV7l1sfEmO0'
   };
   
